@@ -1,0 +1,169 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
+class Program
+{
+    static void Main()
+    {
+        char[] zn = { '+', '-', '/', '*' };
+        char[] vr = { 'x' };
+        char[] special = { '^' };
+        Console.WriteLine("integral calculator");
+        string example = "ing{-x^11+3+-2}";
+        string ing = example.Replace("ing", " ").Replace("{", " ").Replace("}", " ").Replace(" ", "");
+        Console.WriteLine(ing);
+        Integral_Calculating(ing, zn, vr);
+    }
+
+    static void Integral_Calculating(string ing, char[] zn, char[] vr)
+    {
+        List<string> Terms = new List<string>();
+        List<char> variables = new List<char>();
+        List<char> chars = new List<char>();
+        List<char> constants = new List<char>();
+        List<char> ing2 = new List<char>();
+        string r = "";
+        int currentSign = 1;
+
+        for (int i = 0; i < ing.Length; i++)
+        {
+            char c = ing[i];
+            if ((c == '+' || c == '-') && (i == 0 || zn.Contains(ing[i - 1])))
+            {
+                currentSign = c == '+' ? 1 : -1;
+                continue;
+            }
+
+            if (char.IsDigit(c))
+            {
+                int j = i;
+                string number = "";
+                while (j < ing.Length && char.IsDigit(ing[j]))
+                {
+                    number += ing[j];
+                    j++;
+                }
+                i = j - 1;
+                if (currentSign == -1) number = "-" + number;
+                currentSign = 1;
+
+                if (j < ing.Length && vr.Contains(ing[j]))
+                {
+                    int exponent = 1;
+                    if (j + 1 < ing.Length && ing[j + 1] == '^')
+                    {
+                        int x = j + 2;
+                        string expStr = "";
+                        while (x < ing.Length && char.IsDigit(ing[x]))
+                        {
+                            expStr += ing[x];
+                            x++;
+                        }
+                        exponent = Convert.ToInt32(expStr);
+                        i = x - 1 ;
+                    }
+
+                    string term = Standart_ing_formula(number, exponent);
+                    r += term;
+                    Terms.Add(term);
+                    continue;
+                }
+                else
+                {
+                    string term = number + "x";
+                    r += term;
+                    Terms.Add(term);
+                    
+                }
+            }
+            else if (vr.Contains(ing[i]))
+            {
+                string number = currentSign == -1 ? "-1" : "1";
+                currentSign = 1;
+
+                int exponent = 1;
+                if (i + 1 < ing.Length && ing[i + 1] == '^')
+                {
+                    int x = i + 2;
+                    string expStr = "";
+                    while (x < ing.Length && char.IsDigit(ing[x])) expStr += ing[x++];
+                    exponent = Convert.ToInt32(expStr);
+                    i = x - 1;
+                }
+
+                string term = Standart_ing_formula(number, exponent);
+                r += term;
+                Terms.Add(term);
+                continue;
+            }
+            else if (zn.Contains(c))
+            {
+                string term = $"{c}";
+                r += term;
+                Terms.Add(term);
+                continue;
+            }
+        }
+
+        Console.WriteLine(r);
+        r = "";
+        Console.WriteLine("terms:");
+
+        for (int j = 0; j < Terms.Count; j++)
+        {
+           
+            char firstCharCurrent = Terms[j][0];
+            char firstCharNext = j + 1 < Terms.Count ? Terms[j + 1][0] : '\0';
+
+            if (j != 0 && zn.Contains(firstCharNext) && zn.Contains(firstCharCurrent) && firstCharCurrent != firstCharNext)
+            {
+                Terms[j + 1] = Terms[j + 1].Remove(0, 1);
+                Terms[j] = "-"; 
+            }
+            else if(j != 0 && zn.Contains(firstCharNext) && zn.Contains(firstCharCurrent) && firstCharCurrent == firstCharNext)
+            {
+                Terms[j + 1] = Terms[j + 1].Remove(0, 1);
+                Terms[j] = "+";
+            }
+            r += Terms[j];
+                Console.WriteLine(Terms[j]);
+        }
+        Console.WriteLine($"new {r}");
+    }
+
+    static string Standart_ing_formula(string number, int exponent)
+    {
+        exponent = exponent + 1;
+        int numerator = Convert.ToInt32(number);
+        int denominator = Convert.ToInt32(exponent);
+        int gcd = GCD(numerator, denominator);
+        numerator = numerator / gcd;
+        denominator = denominator / gcd;
+
+        if (denominator == 1)
+        {
+            return $"{numerator}x^{exponent}";
+        }
+        else
+        {
+            return $"{numerator}x^{exponent}/{denominator}";
+        }
+    }
+
+    static int GCD(int a, int b)
+    {
+        while (b != 0)
+        {
+            int t = b;
+            b = a % b;
+            a = t;
+        }
+        return Math.Abs(a);
+    }
+}
