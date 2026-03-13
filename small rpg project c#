@@ -1,0 +1,138 @@
+using System;
+
+namespace ConsoleApp13
+{
+    internal class Program
+    {
+        const char Empty = ',';
+        const char Player = 'P';
+        const char wall = '#';
+        const char Enemy = 'E';
+        static int width = 40;
+        static int height = 20;
+        
+
+        static char[,] map = new char[width, height];
+
+        static void Main(string[] args)
+        {
+            Console.SetWindowSize(80, 50);
+            Console.SetBufferSize(80, 50);
+            int x = width / 2;
+            int y = height / 2;
+            int prevX = x;
+            int prevY = y;
+            int enemyX = width / 4;
+            int enemyY = height / 4;
+            
+            InitializeMap(x, y);
+            DrawMap();
+            
+            ConsoleKeyInfo key;
+
+            while (true)
+            {
+                Random rnd = new Random();
+                Console.CursorVisible = false;
+                if (Console.KeyAvailable)
+                {
+                    
+                    key = Console.ReadKey(intercept: true);
+
+                    int newX = x;
+                    int newY = y;
+
+                    if (key.Key == ConsoleKey.W) newY += 1;
+                    if (key.Key == ConsoleKey.S) newY -= 1;
+                    if (key.Key == ConsoleKey.A) newX -= 1;
+                    if (key.Key == ConsoleKey.D) newX += 1;
+
+
+                    newX = Math.Clamp(newX, 0, width - 1);
+                    newY = Math.Clamp(newY, 0, height - 1);
+
+
+                    if (map[newX, newY] != wall)
+                    {
+
+                        Console.SetCursorPosition(prevX, height - 1 - prevY);
+                        Console.Write(map[prevX, prevY]);
+
+                        x = newX;
+                        y = newY;
+
+
+                        Console.SetCursorPosition(x, height - 1 - y);
+                        Console.Write(Player);
+
+                        prevX = x;
+                        prevY = y;
+                    }
+
+                    
+                }
+                int enemymovex = enemyX;
+                int enemymovey = enemyY;
+                int movedirection = rnd.Next(4);
+                switch (movedirection)
+                {
+                    case 0: enemymovex += 1; break;
+                    case 1: enemymovex -= 1; break;
+                    case 2: enemymovey += 1; break;
+                    case 3: enemymovey -= 1; break;
+                }
+                enemymovex = Math.Clamp(enemymovex, 0, width - 1);
+                enemymovey = Math.Clamp(enemymovey, 0, height - 1);
+                if (map[enemymovex, enemymovey] != wall && (enemymovex != x || enemymovey != y))
+                {
+                    map[enemyX, enemyY] = Empty;
+                    Console.SetCursorPosition(enemyX, height - 1 - enemyY);
+                    Console.Write(Empty);
+
+                    enemyX = enemymovex;
+                    enemyY = enemymovey;
+                    Console.SetCursorPosition(enemyX, height - 1 - enemyY);
+                    Console.Write(Enemy);
+                }
+                System.Threading.Thread.Sleep(100);
+            }
+        }
+
+        static void InitializeMap(int playerX, int playerY)
+        {
+            Random rnd = new Random();
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    map[x, y] = rnd.NextDouble() < 0.05 ? wall : Empty;
+                }
+            }
+            for (int x = 0; x < width; x++)
+            {
+                map[x, 0] = wall;            // bottom
+                map[x, height - 1] = wall;   // top
+            }
+            for (int y = 0; y < height; y++)
+            {
+                map[0, y] = wall;            // left
+                map[width - 1, y] = wall;    // right
+            }
+
+            map[playerX, playerY] = Empty;
+        }
+
+        static void DrawMap()
+        {
+            for (int y = height - 1; y >= 0; y--)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    Console.Write(map[x, y]);
+                }
+                Console.WriteLine();
+            }
+        }
+    }
+}
