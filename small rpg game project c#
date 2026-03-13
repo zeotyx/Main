@@ -81,8 +81,7 @@ namespace ConsoleApp13
                         enemyX = enemymovex;
                         enemyY = enemymovey;
 
-                        Console.SetCursorPosition(enemyX, height - 1 - enemyY);
-                        Console.Write(Enemy);
+                        DrawEntity(enemyX, enemyY, Enemy);
                     }
                     else if (map[enemymovex, enemymovey] == wall)
                     {
@@ -135,8 +134,7 @@ namespace ConsoleApp13
                         enemyX = enemymovex;
                         enemyY = enemymovey;
 
-                        Console.SetCursorPosition(enemyX, height - 1 - enemyY);
-                        Console.Write(Enemy);
+                        DrawEntity(enemyX, enemyY, Enemy);
                     }
                 }
                 else
@@ -159,13 +157,17 @@ namespace ConsoleApp13
 
                         enemyX = enemymovex;
                         enemyY = enemymovey;
-
-                        Console.SetCursorPosition(enemyX, height - 1 - enemyY);
-                        Console.Write(Enemy);
+                        DrawEntity(enemyX, enemyY, Enemy);
+                        
                     }
                 }
                 Thread.Sleep(100);
             }
+        }
+        static void DrawEntity(int x, int y, char symbol)
+        {
+            Console.SetCursorPosition(x, height - 1 - y);
+            Console.Write(symbol);
         }
         static void Player_Movement(ConsoleKeyInfo key, ref int x, ref int y, ref int prevY, ref int prevX)
         {
@@ -193,8 +195,7 @@ namespace ConsoleApp13
                 y = newY;
 
 
-                Console.SetCursorPosition(x, height - 1 - y);
-                Console.Write(Player);
+                DrawEntity(x, y, Player);
 
                 prevX = x;
                 prevY = y;
@@ -208,7 +209,7 @@ namespace ConsoleApp13
             {
                 for (int y = 0; y < height; y++)
                 {
-                    map[x, y] = rnd.NextDouble() < 0.05 ? wall : Empty;
+                    map[x, y] = rnd.NextDouble() < 0.1 ? wall : Empty;
                 }
             }
             for (int x = 0; x < width; x++)
