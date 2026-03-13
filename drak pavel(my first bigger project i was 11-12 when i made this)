@@ -1,0 +1,680 @@
+using System;
+using System.ComponentModel;
+using System.ComponentModel.Design;
+using System.Data;
+using System.Linq;
+using System.Threading;
+ 
+ 
+ 
+namespace hra
+{
+    internal class Program
+    {
+ 
+ 
+        static void Main(string[] args)
+        {
+            var admincode = "1234";
+ 
+            var opakova = 0;
+ 
+            var mobhp = 0;
+ 
+            var zivoty = 300;
+            var damage = 1;
+            var zlataky = 0;
+            var zabnep = 0;
+            var zvolení = 0;
+            var celkzlat = 0;
+            var celkzab = 0;
+            var cirkl = true;
+            var drak = 0;
+            string[] shop = { "meč", "luk" };
+            string[] inventar = { "ruka" };
+            string equip1 = "rukou";
+            var veckoupeno = 0;
+            var ubran = 0;
+            int enter = Convert.ToInt32(ConsoleKey.Enter);
+ 
+            Console.WriteLine("pro admin money zadej code");
+ 
+            if (Console.ReadLine() == admincode)
+            {
+                Console.WriteLine("spravne ziskavas temer infinite money a 4 zabiti na test");
+                celkzlat = 10000000;
+                celkzab = 0;
+                veckoupeno = 2;
+                inventar = inventar.Append(shop[0]).ToArray();
+                inventar = inventar.Append(shop[1]).ToArray();
+                Console.WriteLine("\nkolik chces zivotu");
+                zivoty = Convert.ToInt32(Console.ReadLine());
+                Console.Clear();
+            }
+            else
+            {
+                Console.WriteLine("nespravne");
+            }
+ 
+ 
+ 
+            while (cirkl == true)
+            {
+                while (zabnep <= 5 && cirkl == true)
+                {
+                    Console.WriteLine("1.prozkoumat jeskyni \n" + "2.ukazat stav \n" + "3.otevřit shop\n" + "4.equipnout vec\n" + "5.ukončit hru\n");
+                    zvolení = Convert.ToInt32(Console.ReadLine());
+                    if (zivoty <= 0)
+                    {
+                        Console.Beep(1000, 2000);
+                        Console.WriteLine("uz nemas zivoty");
+                        Console.WriteLine("co si prejes udelat\n1.restartovat hru\n2.vypnout hru\n3.koupit si 300 HP za 2000 goldu ");
+                        string vyber = Console.ReadLine();
+                        if (vyber == "1")
+                        {
+                            Console.WriteLine("dobre skoncil jsi s:");
+                            Console.WriteLine(celkzlat + " zlataku" + " zabil jsi " + celkzab + " a mas " + zivoty + "zivotu");
+ 
+                            Console.Clear();
+ 
+ 
+                        }
+ 
+                        if (vyber == "2")
+                        {
+                            cirkl = false;
+                            break;
+                        }
+ 
+                        if (vyber == "3")
+                        {
+                            if (zlataky >= 2000)
+                            {
+                                Console.WriteLine("bylo ti odeceteno 2000 zlataku");
+                            }
+                            else
+                            {
+                                Console.WriteLine("nemas dostatek zlataku");
+                            }
+ 
+                        }
+                    }
+                    if (zvolení == enter)
+                    {
+                        break;
+                    }
+                    if (zvolení == 5)
+                    {
+                        cirkl = false;
+                        break;
+                    }
+ 
+                    else
+                    {
+                        Console.WriteLine("toto neni moznost");
+                    }
+                    if (zvolení == 1)
+                    {
+                        Console.Clear();
+                        string mob1;
+                        string[] mob = { "pavouka", "zombika", "skeletona", "škorpiona", "hada", "drak pavel" };
+                        mob1 = Convert.ToString(mob[getrandommob()]);
+ 
+ 
+ 
+ 
+ 
+ 
+                        if (mob1 == "zombika")
+                        {
+ 
+                            mobhp = 10;
+                            Console.WriteLine("nasel si " + mob1 + "\n" + mobhp + " enterem mu uberes");
+                            while (mobhp != 0 && mobhp > 0)
+                            {
+                                if (Console.ReadKey().Key == ConsoleKey.Enter)
+                                {
+                                    if (zivoty <= 0)
+                                    {
+                                        Console.Beep(1000, 2000);
+                                        Console.WriteLine("uz nemas zivoty");
+                                        Console.WriteLine("co si prejes udelat\n1.restartovat hru\n2.vypnout hru\n3.koupit si 300 HP za 2000 goldu ");
+                                        string vyber = Console.ReadLine();
+                                        if (vyber == "1")
+                                        {
+                                            Console.WriteLine("dobre skoncil jsi s:");
+                                            Console.WriteLine(celkzlat + " zlataku" + " zabil jsi " + celkzab + " a mas " + zivoty + "zivotu");
+ 
+                                            Console.Clear();
+ 
+ 
+                                        }
+ 
+                                        if (vyber == "2")
+                                        {
+                                            cirkl = false;
+                                            break;
+                                        }
+ 
+                                        if (vyber == "3")
+                                        {
+                                            if (zlataky >= 2000)
+                                            {
+                                                Console.WriteLine("bylo ti odeceteno 2000 zlataku");
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine("nemas dostatek zlataku");
+                                            }
+ 
+                                        }
+                                    }
+                                    ubran = ubiraniHP();
+                                    zivoty = zivoty - ubran;
+                                    Console.Clear();
+                                    mobhp = mobhp - damage;
+                                    Console.WriteLine(mobhp + "HP\n");
+                                    Console.WriteLine("ubral ti:" + ubran);
+                                }
+                            }
+ 
+                            zlataky = zlataky + GetRandomNumber();
+                            zabnep++;
+                            celkzab++;
+                            celkzlat = zlataky + celkzlat;
+                            Console.WriteLine("uspesne si ho zabil " + equip1 + " a ziskavas");
+                            Console.WriteLine(zlataky + " " + "zlataku");
+                            zlataky = 0;
+                            Thread.Sleep(1000);
+                            Console.Clear();
+                        }
+ 
+                        if (mob1 == "skeletona")
+                        {
+                            mobhp = 13;
+                            Console.WriteLine("nasel si " + mob1 + "\n" + mobhp + " enterem mu uberes");
+                            while (mobhp != 0 && mobhp > 0)
+                            {
+                                if (Console.ReadKey().Key == ConsoleKey.Enter)
+                                {
+                                    if (zivoty <= 0)
+                                    {
+                                        Console.Beep(1000, 2000);
+                                        Console.WriteLine("uz nemas zivoty");
+                                        Console.WriteLine("co si prejes udelat\n1.restartovat hru\n2.vypnout hru\n3.koupit si 300 HP za 2000 goldu ");
+                                        string vyber = Console.ReadLine();
+                                        if (vyber == "1")
+                                        {
+                                            Console.WriteLine("dobre skoncil jsi s:");
+                                            Console.WriteLine(celkzlat + " zlataku" + " zabil jsi " + celkzab + " a mas " + zivoty + "zivotu");
+ 
+                                            Console.Clear();
+ 
+ 
+                                        }
+ 
+                                        if (vyber == "2")
+                                        {
+                                            cirkl = false;
+                                            break;
+                                        }
+ 
+                                        if (vyber == "3")
+                                        {
+                                            if (zlataky >= 2000)
+                                            {
+                                                Console.WriteLine("bylo ti odeceteno 2000 zlataku");
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine("nemas dostatek zlataku");
+                                            }
+ 
+                                        }
+                                    }
+                                    ubran = ubiraniHP();
+                                    zivoty = zivoty - ubran;
+                                    Console.Clear();
+                                    mobhp = mobhp - damage;
+                                    Console.WriteLine(mobhp + "HP\n");
+                                    Console.WriteLine("ubral ti:" + ubran);
+                                }
+                            }
+                            zlataky = zlataky + 2 + GetRandomNumber();
+                            zabnep++;
+                            celkzab++;
+                            celkzlat = zlataky + celkzlat;
+                            Console.WriteLine("uspesne si ho zabil " + equip1 + " a ziskavas");
+                            Console.WriteLine(zlataky + " " + "zlataku");
+                            zlataky = 0;
+                            Thread.Sleep(1000);
+                            Console.Clear();
+                        }
+ 
+                        if (mob1 == "pavouka")
+                        {
+                            mobhp = 5;
+                            Console.WriteLine("nasel si " + mob1 + "\n" + mobhp + " enterem mu uberes");
+                            while (mobhp != 0 && mobhp > 0)
+                            {
+                                if (Console.ReadKey().Key == ConsoleKey.Enter)
+                                {
+                                    if (zivoty <= 0)
+                                    {
+                                        Console.Beep(1000, 2000);
+                                        Console.WriteLine("uz nemas zivoty");
+                                        Console.WriteLine("co si prejes udelat\n1.restartovat hru\n2.vypnout hru\n3.koupit si 300 HP za 2000 goldu ");
+                                        string vyber = Console.ReadLine();
+                                        if (vyber == "1")
+                                        {
+                                            Console.WriteLine("dobre skoncil jsi s:");
+                                            Console.WriteLine(celkzlat + " zlataku" + " zabil jsi " + celkzab + " a mas " + zivoty + "zivotu");
+ 
+                                            Console.Clear();
+ 
+ 
+                                        }
+ 
+                                        if (vyber == "2")
+                                        {
+                                            cirkl = false;
+                                            break;
+                                        }
+ 
+                                        if (vyber == "3")
+                                        {
+                                            if (zlataky >= 2000)
+                                            {
+                                                Console.WriteLine("bylo ti odeceteno 2000 zlataku");
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine("nemas dostatek zlataku");
+                                            }
+ 
+                                        }
+                                    }
+                                    ubran = ubiraniHP();
+                                    zivoty = zivoty - ubran;
+                                    Console.Clear();
+                                    mobhp = mobhp - damage;
+                                    Console.WriteLine(mobhp + "HP\n");
+                                    Console.WriteLine("ubral ti:" + ubran);
+                                }
+                            }
+                            zlataky = zlataky - 5 + GetRandomNumber();
+                            zabnep++;
+                            celkzab++;
+                            celkzlat = zlataky + celkzlat;
+                            Console.WriteLine("uspesne si ho zabil " + equip1 + " a ziskavas");
+                            Console.WriteLine(zlataky + " " + "zlataku");
+                            zlataky = 0;
+                            Thread.Sleep(3000);
+                            Console.Clear();
+                        }
+ 
+                        if (mob1 == "škorpiona")
+                        {
+                            mobhp = 6;
+                            Console.WriteLine("nasel si " + mob1 + "\n" + mobhp + " enterem mu uberes");
+                            while (mobhp != 0 && mobhp > 0)
+                            {
+                                if (Console.ReadKey().Key == ConsoleKey.Enter)
+                                {
+                                    if (zivoty <= 0)
+                                    {
+                                        Console.Beep(1000, 2000);
+                                        Console.WriteLine("uz nemas zivoty");
+                                        Console.WriteLine("co si prejes udelat\n1.restartovat hru\n2.vypnout hru\n3.koupit si 300 HP za 2000 goldu ");
+                                        string vyber = Console.ReadLine();
+                                        if (vyber == "1")
+                                        {
+                                            Console.WriteLine("dobre skoncil jsi s:");
+                                            Console.WriteLine(celkzlat + " zlataku" + " zabil jsi " + celkzab + " a mas " + zivoty + "zivotu");
+ 
+                                            Console.Clear();
+ 
+ 
+                                        }
+ 
+                                        if (vyber == "2")
+                                        {
+                                            cirkl = false;
+                                            break;
+                                        }
+ 
+                                        if (vyber == "3")
+                                        {
+                                            if (zlataky >= 2000)
+                                            {
+                                                Console.WriteLine("bylo ti odeceteno 2000 zlataku");
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine("nemas dostatek zlataku");
+                                            }
+ 
+                                        }
+                                    }
+                                    ubran = ubiraniHP();
+                                    zivoty = zivoty - ubran;
+                                    Console.Clear();
+                                    mobhp = mobhp - damage;
+                                    Console.WriteLine(mobhp + "HP\n");
+                                    Console.WriteLine("ubral ti:" + ubran);
+                                }
+                            }
+                            zlataky = zlataky - 3 + GetRandomNumber();
+                            zabnep++;
+                            celkzab++;
+                            celkzlat = zlataky + celkzlat;
+                            Console.WriteLine("uspesne si ho zabil " + equip1 + " a ziskavas");
+                            Console.WriteLine(zlataky + " " + "zlataku");
+                            zlataky = 0;
+                            Thread.Sleep(3000);
+                            Console.Clear();
+                        }
+ 
+                        if (mob1 == "hada")
+                        {
+                            mobhp = 3;
+                            Console.WriteLine("nasel si " + mob1 + "\n" + mobhp + " enterem mu uberes");
+                            while (mobhp != 0 && mobhp > 0)
+                            {
+                                if (Console.ReadKey().Key == ConsoleKey.Enter)
+                                {
+                                    if (zivoty <= 0)
+                                    {
+                                        Console.Beep(1000, 2000);
+                                        Console.WriteLine("uz nemas zivoty");
+                                        Console.WriteLine("co si prejes udelat\n1.restartovat hru\n2.vypnout hru\n3.koupit si 300 HP za 2000 goldu ");
+                                        string vyber = Console.ReadLine();
+                                        if (vyber == "1")
+                                        {
+                                            Console.WriteLine("dobre skoncil jsi s:");
+                                            Console.WriteLine(celkzlat + " zlataku" + " zabil jsi " + celkzab + " a mas " + zivoty + "zivotu");
+ 
+                                            Console.Clear();
+ 
+ 
+                                        }
+ 
+                                        if (vyber == "2")
+                                        {
+                                            cirkl = false;
+                                            break;
+                                        }
+ 
+                                        if (vyber == "3")
+                                        {
+                                            if (zlataky >= 2000)
+                                            {
+                                                Console.WriteLine("bylo ti odeceteno 2000 zlataku");
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine("nemas dostatek zlataku");
+                                            }
+ 
+                                        }
+                                    }
+                                    ubran = ubiraniHP();
+                                    zivoty = zivoty - ubran;
+                                    Console.Clear();
+                                    mobhp = mobhp - damage;
+                                    Console.WriteLine(mobhp + "HP\n");
+                                    Console.WriteLine("ubral ti:" + ubran);
+                                }
+                            }
+                            zlataky = zlataky - 9 + GetRandomNumber();
+                            zabnep++;
+                            celkzab++;
+                            celkzlat = zlataky + celkzlat;
+                            Console.WriteLine("uspesne si ho zabil " + equip1 + " a ziskavas");
+                            Console.WriteLine(zlataky + " " + "zlataku");
+                            zlataky = 0;
+                            Thread.Sleep(3000);
+                            Console.Clear();
+                        }
+ 
+                        if (celkzab == 5)
+                        {
+                            mobhp = 50;
+                            Console.WriteLine("nasel si Draka Pavla(final boss) Enterem mu uberes");
+                            while (mobhp != 0 && mobhp > 0)
+                            {
+                                if (Console.ReadKey().Key == ConsoleKey.Enter)
+                                {
+                                    ubran = ubiraniHP();
+                                    zivoty = zivoty - ubran;
+                                    Console.Clear();
+                                    mobhp = mobhp - damage;
+                                    Console.WriteLine(mobhp + "HP\n");
+                                    Console.WriteLine("ubral ti:" + ubran);
+ 
+                                }
+                            }
+                            zlataky = zlataky + drakzlat();
+                            zabnep++;
+                            celkzab++;
+                            celkzlat = zlataky + celkzlat;
+                            Console.WriteLine("uspesne si zabil DRAKA PAVLA " + equip1 + " a ziskavas");
+                            Console.WriteLine(zlataky + " " + "zlataku");
+                            zlataky = 0;
+                            Thread.Sleep(3000);
+                            Console.Clear();
+                        }
+                    }
+ 
+                    if (zvolení == 2)
+                    {
+                        Console.Clear();
+                        zlataky = zlataky / 2;
+                        Console.WriteLine("tvuj stav je:" + celkzlat + " zlataku" + " zabil jsi " + celkzab + " a mas " + zivoty + "zivotu");
+                        Thread.Sleep(1000);
+                        Console.Clear();
+                    }
+ 
+                    if (zvolení == 3)
+                    {
+                        Console.Clear();
+                        if (veckoupeno == 0)
+                        {
+                            Console.WriteLine("v shopu se nachazi 1.mec po koupi mece tam budou dalsi veci ke koupi :]");
+                            var shopkup = Convert.ToInt32(Console.ReadLine());
+                            if (shopkup == 1)
+                            {
+                                Console.WriteLine("mec stoji 3000zlataku a ubira 5 damage chces ho koupit ano nebo ne");
+                                var anonesh = Console.ReadLine();
+                                if (anonesh == "Ano" || anonesh == "ano")
+                                {
+                                    if (celkzlat >= 3000)
+                                    {
+                                        Console.WriteLine("mec byl zakoupen bylo ti strhnuto 3000zlataku");
+ 
+                                        celkzlat = celkzlat - 3000;
+                                        inventar = inventar.Append(shop[0]).ToArray();
+                                        veckoupeno = 1;
+                                        Thread.Sleep(1000);
+                                        Console.Clear();
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("nemas na to dostatek zlataku");
+                                        Thread.Sleep(1000);
+                                        Console.Clear();
+                                    }
+ 
+                                }
+                                else
+                                {
+                                    Console.WriteLine("\ndobre vracim vas spatky do hlavni casti hry \n");
+                                    Thread.Sleep(1000);
+                                    Console.Clear();
+                                }
+                            }
+                        }
+                        else if (veckoupeno == 1)
+                        {
+                            Console.WriteLine("v shope se objevila 1 nova vec 1.Luk ");
+                            var shopkup = Convert.ToInt32(Console.ReadLine());
+                            if (shopkup == 1)
+                            {
+                                Console.WriteLine("luk stoji 5000zlataku a ubira 10 damage chces ho koupit ano nebo ne");
+                                var anonesh = Console.ReadLine();
+                                if (anonesh == "Ano" || anonesh == "ano")
+                                {
+                                    if (celkzlat >= 5000)
+                                    {
+                                        Console.WriteLine("mec byl zakoupen bylo ti strhnuto 3000zlataku");
+ 
+                                        celkzlat = celkzlat - 5000;
+                                        inventar = inventar.Append(shop[1]).ToArray();
+                                        veckoupeno = 2;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("nemas na to dostatek zlataku");
+                                        Thread.Sleep(1000);
+                                        Console.Clear();
+                                    }
+ 
+                                }
+                                else
+                                {
+                                    Console.WriteLine("\ndobre vracim vas spatky do hlavni casti hry \n");
+                                    Thread.Sleep(1000);
+                                    Console.Clear();
+                                }
+                            }
+ 
+ 
+                        }
+                        else if (veckoupeno == 2)
+                        {
+                            Console.WriteLine("uz si vse koupil");
+                            Thread.Sleep(1000);
+                            Console.Clear();
+                        }
+ 
+                    }
+ 
+ 
+                    if (zvolení == 4)
+                    {
+                        opakova = 0;
+                        Console.Clear();
+ 
+                        Console.WriteLine("co si prejes equipnout tvuj invetar se ti zobrazi ted");
+                        foreach (string i in inventar)
+                        {
+ 
+                            opakova++;
+                            Console.WriteLine(opakova + "." + i + "\n");
+ 
+ 
+ 
+ 
+                        }
+                        var invvyb = Console.ReadLine();
+                        opakova = opakova - 1;
+                        if (invvyb == "ruka")
+                        {
+                            Console.WriteLine("byla equipnuta ruka");
+                            damage = 1;
+                            equip1 = "rukou";
+                            Thread.Sleep(1000);
+                            Console.Clear();
+                        }
+ 
+                        if (invvyb == "mec" || invvyb == "2")
+                        {
+                            if (opakova >= 1)
+                            {
+                                Console.WriteLine("byl equipnut mec");
+                                equip1 = "mecem";
+                                damage = 5;
+                                Thread.Sleep(1000);
+                                Console.Clear();
+                            }
+                            else
+                            {
+                                Console.WriteLine("mec nemas nesnas se obelhat system");
+                                Thread.Sleep(1000);
+                                Console.Clear();
+                            }
+                        }
+ 
+                        if (invvyb == "luk" || invvyb == "3")
+                        {
+                            if (opakova >= 2)
+                            {
+                                Console.WriteLine("byl equipnut luk");
+                                damage = 10;
+                                equip1 = "lukem";
+                                Thread.Sleep(1000);
+                                Console.Clear();
+ 
+                            }
+                            else
+                            {
+                                Console.WriteLine("luk nemas nesnas se obelhat system");
+                                Thread.Sleep(1000);
+                                Console.Clear();
+                            }
+                        }
+ 
+ 
+ 
+ 
+                    }
+ 
+                }
+ 
+            }
+ 
+        }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+        /*metody pro random*/
+ 
+        static int ubiraniHP()
+        {
+            Random HPdown = new Random();
+            return HPdown.Next(0, 8);
+        }
+ 
+ 
+ 
+        static int drakzlat()
+        {
+            Random drak = new Random();
+            return drak.Next(1000, 10000);
+ 
+        }
+ 
+        static int getrandommob()
+        {
+            Random random = new Random();
+            return random.Next(0, 4);
+ 
+        }
+        static int GetRandomNumber()
+        {
+            Random random1 = new Random();
+            return random1.Next(10, 100);
+        }
+        /*~~~~~~~~*/
+ 
+ 
+ 
+ 
+    }
+}
