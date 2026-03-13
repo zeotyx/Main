@@ -5,384 +5,356 @@ import numpy as np
 import time
 import pyttsx3
 import speech_recognition as sr
-from datetime import datetime
-from functions.online_ops import (
-    find_my_ip, get_random_advice, get_random_joke, 
-    play_on_youtube, search_on_google, search_on_wikipedia, 
-    send_email, send_whatsapp_message, get_weather)
-from functions.os_ops import open_calculator, open_camera, open_cmd, open_notepad, open_discord
-from decouple import config
 import threading
-import math
-import re
+from datetime import datetime
 from fuzzywuzzy import fuzz
+from decouple import config
 
+from functions.online_ops import (
+    find_my_ip,
+    get_random_advice,
+    get_random_joke,
+    play_on_youtube,
+    search_on_google,
+    search_on_wikipedia,
+    send_email,
+    send_whatsapp_message,
+    get_weather
+)
 
-PREDEFINED_CITIES = ['Pardubice', 'Prague', 'London', 'New York', 'Los Angeles', 'Tokyo', 'Berlin']
-def evaluate_expression(expression):
-    try:
-        
-        result = eval(expression)
-        return result
-    except Exception as e:
-        speak("Sorry, I couldn't understand the math expression.")
-        print(f"Error evaluating expression: {e}")
-        return None
+from functions.os_ops import (
+    open_calculator,
+    open_camera,
+    open_cmd,
+    open_notepad,
+    open_discord
+)
 
-def get_closest_city(query):
-    best_match = None
-    highest_score = 0
+# ---------------------------------------------------
+# Configuration
+# ---------------------------------------------------
 
-    # Compare user input with predefined cities using fuzzy matching
-    for city in PREDEFINED_CITIES:
-        score = fuzz.ratio(query.lower(), city.lower())
-        if score > highest_score:
-            highest_score = score
-            best_match = city
+USERNAME = config("USER")
+BOTNAME = config("BOTNAME")
 
-    
-    if highest_score > 75:  
-        return best_match
-    else:
-        return None
+PREDEFINED_CITIES = [
+    "Pardubice", "Prague", "London",
+    "New York", "Los Angeles", "Tokyo", "Berlin"
+]
 
-def initialize_tts():
-    engine = pyttsx3.init()
-    engine.setProperty('rate', 150)  
-    engine.setProperty('volume', 1)  
-    return engine
+# ---------------------------------------------------
+# Text To Speech
+# ---------------------------------------------------
+
+engine = pyttsx3.init()
+engine.setProperty("rate", 185)
+engine.setProperty("volume", 1)
+
 
 def speak(text):
+    print("Jarvis:", text)
     engine.say(text)
     engine.runAndWait()
 
-# Function to greet the user
+
+# ---------------------------------------------------
+# Greeting
+# ---------------------------------------------------
+
 def greet_user():
     hour = datetime.now().hour
-    if 6 <= hour < 12:
-        speak(f"Good Morning {USERNAME}")
-    elif 12 <= hour < 16:
-        speak(f"Good Afternoon {USERNAME}")
-    elif 16 <= hour < 19:
-        speak(f"Good Evening {USERNAME}")
+
+    if hour < 12:
+        speak(f"Good morning {USERNAME}")
+    elif hour < 18:
+        speak(f"Good afternoon {USERNAME}")
     else:
-        speak("Good Night!")
-    speak(f"I am {BOTNAME}. How may I assist you?")
+        speak(f"Good evening {USERNAME}")
+
+    speak(f"I'm {BOTNAME}. How can I help?")
 
 
-def take_user_input():
-    r = sr.Recognizer()
+# ---------------------------------------------------
+# Voice Recognition
+# ---------------------------------------------------
+
+def listen():
+    recognizer = sr.Recognizer()
+
     with sr.Microphone() as source:
-        print('Listening....')
-        r.adjust_for_ambient_noise(source, duration=1)  
-        r.pause_threshold = 1  
+        print("Listening...")
+        recognizer.adjust_for_ambient_noise(source, duration=1)
 
         try:
-            audio = r.listen(source, timeout=10, phrase_time_limit=10)
-            print('Recognizing...')
-            query = r.recognize_google(audio, language='en-in', show_all=False)
-            print(f"User said: {query}")
+            audio = recognizer.listen(source, timeout=10, phrase_time_limit=10)
+            query = recognizer.recognize_google(audio).lower()
 
-           
-            if "weather" in query:
-                speak("Which city do you want the weather information for?")
-                city_query = take_user_input()
-                city = get_closest_city(city_query)
+            print("User:", query)
+            return query
 
-                if city:
-                    speak(f"Did you mean {city}?")
-                    confirm_query = take_user_input()
-                    if 'yes' in confirm_query:
-                        weather_info = get_weather(city)
-                        speak(weather_info)
-                        print(weather_info)
-                    else:
-                        speak("Please provide the city name again.")
-                else:
-                    speak("I couldn't recognize the city. Could you please repeat?")
-            else:
-                return query.lower()
         except sr.WaitTimeoutError:
-            speak("Sorry, I didn't hear anything. Could you please repeat?")
-            return 'None'
+            speak("I didn't hear anything.")
         except sr.RequestError:
-            speak("Sorry, I couldn't reach the server. Please try again later.")
-            return 'None'
-        except Exception as e:
-            print(f"Error: {e}")
-            speak('Sorry, I could not understand. Could you please say that again?')
-            return 'None'
+            speak("Speech service unavailable.")
+        except Exception:
+            speak("Sorry, I didn't catch that.")
 
-    return query.lower()
+    return ""
 
-# Initialize variables
-USERNAME = config('USER')
-BOTNAME = config('BOTNAME')
-engine = pyttsx3.init('sapi5')
-engine.setProperty('rate', 190)
-engine.setProperty('volume', 1.0)
-voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[1].id)
 
+# ---------------------------------------------------
+# Math
+# ---------------------------------------------------
+
+def evaluate_expression(query):
+    try:
+        query = query.replace("plus", "+")
+        query = query.replace("minus", "-")
+        query = query.replace("times", "*")
+        query = query.replace("divided by", "/")
+
+        result = eval(query)
+        speak(f"The result is {result}")
+        return result
+
+    except Exception:
+        speak("I couldn't calculate that.")
+        return None
+
+
+# ---------------------------------------------------
+# City Matching
+# ---------------------------------------------------
+
+def closest_city(query):
+    best_city = None
+    best_score = 0
+
+    for city in PREDEFINED_CITIES:
+        score = fuzz.ratio(query.lower(), city.lower())
+
+        if score > best_score:
+            best_score = score
+            best_city = city
+
+    if best_score > 75:
+        return best_city
+
+    return None
+
+
+# ---------------------------------------------------
+# Command Handling
+# ---------------------------------------------------
+
+def handle_query(query):
+
+    if "hello" in query:
+        speak("Hello!")
+
+    elif "open notepad" in query:
+        open_notepad()
+
+    elif "open discord" in query:
+        open_discord()
+
+    elif "open command prompt" in query or "open cmd" in query:
+        open_cmd()
+
+    elif "open camera" in query:
+        open_camera()
+
+    elif "open calculator" in query:
+        open_calculator()
+
+    elif "ip address" in query:
+        ip = find_my_ip()
+        speak(f"Your IP address is {ip}")
+
+    elif "joke" in query:
+        speak(get_random_joke())
+
+    elif "advice" in query:
+        speak(get_random_advice())
+
+    elif "youtube" in query:
+        speak("What should I play?")
+        video = listen()
+        play_on_youtube(video)
+
+    elif "google" in query:
+        speak("What should I search?")
+        search = listen()
+        search_on_google(search)
+
+    elif "wikipedia" in query:
+        speak("What do you want to search?")
+        topic = listen()
+        result = search_on_wikipedia(topic)
+        speak(result)
+
+    elif "weather" in query:
+        speak("Which city?")
+        city_query = listen()
+        city = closest_city(city_query)
+
+        if city:
+            weather = get_weather(city)
+            speak(weather)
+        else:
+            speak("I couldn't recognize the city.")
+
+    elif "time" in query:
+        now = datetime.now().strftime("%H:%M")
+        speak(f"The time is {now}")
+
+    elif any(x in query for x in ["plus", "minus", "times", "divided"]):
+        evaluate_expression(query)
+
+
+# ---------------------------------------------------
+# Voice Thread
+# ---------------------------------------------------
+
+def voice_loop():
+    while True:
+        query = listen()
+        if query:
+            handle_query(query)
+
+
+# ---------------------------------------------------
+# Hand Tracking
+# ---------------------------------------------------
 
 mp_hands = mp.solutions.hands
-hands = mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.7)
-mp_drawing = mp.solutions.drawing_utils
+hands = mp_hands.Hands(
+    min_detection_confidence=0.7,
+    min_tracking_confidence=0.7
+)
 
+mp_draw = mp.solutions.drawing_utils
 
 screen_width, screen_height = pyautogui.size()
 
 cap = cv2.VideoCapture(0)
 
+previous_x = None
+previous_y = None
 
-previous_x, previous_y = None, None  
-smooth_factor = 0.6  
+smooth_factor = 0.6
+
+scale_x = 1.8
+scale_y = 0.75
 
 
-scale_factor_x = 1.8 
-scale_factor_y = 0.75  
+def pinch(hand, w, h):
+    index = hand.landmark[8]
+    thumb = hand.landmark[4]
 
-def is_pinch(hand_landmarks, frame_width, frame_height):
-    index_tip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP]
-    thumb_tip = hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_TIP]
-    
-    index_x, index_y = int(index_tip.x * frame_width), int(index_tip.y * frame_height)
-    thumb_x, thumb_y = int(thumb_tip.x * frame_width), int(thumb_tip.y * frame_height)
-    
-    distance = np.sqrt((index_x - thumb_x) ** 2 + (index_y - thumb_y) ** 2)
-    
+    ix, iy = int(index.x * w), int(index.y * h)
+    tx, ty = int(thumb.x * w), int(thumb.y * h)
+
+    distance = np.sqrt((ix - tx) ** 2 + (iy - ty) ** 2)
+
     return distance < 27
 
-def is_middle_thumb_together(hand_landmarks, frame_width, frame_height):
-    middle_tip = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP]
-    thumb_tip = hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_TIP]
-    
-    middle_x, middle_y = int(middle_tip.x * frame_width), int(middle_tip.y * frame_height)
-    thumb_x, thumb_y = int(thumb_tip.x * frame_width), int(thumb_tip.y * frame_height)
-    
-    distance = np.sqrt((middle_x - thumb_x) ** 2 + (middle_y - thumb_y) ** 2)
-    
+
+def click_gesture(hand, w, h):
+    middle = hand.landmark[12]
+    thumb = hand.landmark[4]
+
+    mx, my = int(middle.x * w), int(middle.y * h)
+    tx, ty = int(thumb.x * w), int(thumb.y * h)
+
+    distance = np.sqrt((mx - tx) ** 2 + (my - ty) ** 2)
+
     return distance < 24
 
-def voice_recognition_thread():
-    while True:
-        query = take_user_input()
 
-        if 'hello' in query:
-            speak('Hello! How can I help you?')
+# ---------------------------------------------------
+# Main Loop
+# ---------------------------------------------------
 
-        # Apps and 
-        elif 'open notepad' in query:
-            open_notepad()
-        elif 'open discord' in query:
-            open_discord()
-        elif 'open command prompt' in query or 'open cmd' in query:
-            open_cmd()
-        elif 'open camera' in query:
-            open_camera()
-        elif 'open calculator' in query:
-            open_calculator()
-        elif 'plus' in query or 'minus' in query or 'times' in query or 'divided by' in query:
-            query = query.replace('plus', '+').replace('minus', '-').replace('times', '*').replace('divided by', '/')
+def main():
 
-            result = evaluate_expression(query)
-    
-            if result is not None:
-                speak(f"The result is {result}")
-                print(f"Result: {result}")
-            else:
-                speak("I couldn't calculate that.")
-        elif 'ip address' in query:
-            ip_address = find_my_ip()
-            speak(f'Your IP Address is {ip_address}')
-            print(f'Your IP Address is {ip_address}')
-
-        
-        elif 'set alarm' in query:
-            speak("At what time do you want to set the alarm? Please say the time in HH:MM format.")
-            alarm_time = take_user_input()
-            set_alarm(alarm_time)
-            speak(f"Alarm has been set for {alarm_time}")
-            
-        
-        elif 'weather' in query:
-            speak("Which city's weather do you want to know about?")
-            city = take_user_input()
-            weather_info = get_weather(city)
-            speak(f"The weather in {city} is {weather_info}")
-            print(weather_info)
-
-        elif 'time' in query:
-            current_time = get_current_time()
-            speak(f"The current time is {current_time}")
-            print(f"The current time is {current_time}")
-        
-        elif 'wikipedia' in query:
-            speak('What do you want to search on Wikipedia?')
-            search_query = take_user_input()
-            results = search_on_wikipedia(search_query)
-            speak(f"According to Wikipedia, {results}")
-            print(results)  # Print for convenience
-
-        elif 'youtube' in query:
-            speak('What do you want to play on Youtube?')
-            video = take_user_input()
-            play_on_youtube(video)
-
-        elif 'search on google' in query:
-            speak('What do you want to search on Google?')
-            g_query = take_user_input()
-            search_on_google(g_query)
-
-        elif "send whatsapp message" in query:
-            speak('On what number should I send the message? Please enter in the console: ')
-            number = input("Enter the number: ")
-            speak("What is the message?")
-            message = take_user_input()
-            send_whatsapp_message(number, message)
-            speak("I've sent the message.")
-
-        elif "send an email" in query:
-            speak("On what email address do I send it? Please enter in the console: ")
-            receiver_address = input("Enter email address: ")
-            speak("What should be the subject?")
-            subject = take_user_input()
-            speak("What is the message?")
-            message = take_user_input()
-            if send_email(receiver_address, subject, message):
-                speak("I've sent the email.")
-            else:
-                speak("Something went wrong while I was sending the mail.")
-
-        elif 'joke' in query:
-            speak("Hope you like this one.")
-            joke = get_random_joke()
-            speak(joke)
-            print(joke)
-
-        elif "advice" in query:
-            speak("Here's an advice for you.")
-            advice = get_random_advice()
-            speak(advice)
-            print(advice)
-
-        elif 'play music' in query:
-            speak("What music would you like to listen to?")
-            song_name = take_user_input()
-            play_music(song_name)
-            speak(f"Playing {song_name}")
-
-        elif 'shutdown' in query:
-            speak("Are you sure you want to shut down the system?")
-            confirmation = take_user_input()
-            if 'yes' in confirmation:
-                shutdown_system()
-                speak("Shutting down now.")
-
-
-        elif 'open browser' in query:
-            open_browser()
-            speak("Opening your web browser.")
-
-        elif 'take note' in query:
-            speak("What do you want to note down?")
-            note_content = take_user_input()
-            take_note(note_content)
-            speak("Your note has been saved.")
-
-        elif 'remind me' in query:
-            speak("What should I remind you about?")
-            task = take_user_input()
-            speak("When should I remind you?")
-            reminder_time = take_user_input()
-            set_reminder(task, reminder_time)
-            speak(f"I'll remind you about '{task}' at {reminder_time}")
-
-        elif 'translate' in query:
-            speak("What do you want me to translate?")
-            sentence = take_user_input()
-            speak("Which language do you want to translate to?")
-            language = take_user_input()
-            translation = translate_text(sentence, language)
-            speak(f"The translation is: {translation}")
-            print(translation)
-
-        elif 'define' in query:
-            speak("What word do you want me to define?")
-            word = take_user_input()
-            definition = get_word_definition(word)
-            speak(f"The definition of {word} is: {definition}")
-            print(definition)
-
-def main_loop():
-    global previous_x, previous_y  
     greet_user()
 
-    voice_thread = threading.Thread(target=voice_recognition_thread)
-    voice_thread.daemon = True  
+    voice_thread = threading.Thread(target=voice_loop)
+    voice_thread.daemon = True
     voice_thread.start()
 
-    last_click_time = time.time()
+    last_click = time.time()
+
+    global previous_x, previous_y
+
     while cap.isOpened():
+
         ret, frame = cap.read()
         if not ret:
             break
-        
-        frame = cv2.flip(frame, 1) 
-        frame_height, frame_width, _ = frame.shape
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        results = hands.process(rgb_frame)
+
+        frame = cv2.flip(frame, 1)
+
+        h, w, _ = frame.shape
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        results = hands.process(rgb)
 
         if results.multi_hand_landmarks:
-            for hand_landmarks in results.multi_hand_landmarks:
-                wrist = hand_landmarks.landmark[mp_hands.HandLandmark.WRIST]
-                wrist_x = wrist.x * frame_width
-                wrist_y = wrist.y * frame_height
-                mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
-               
-                if previous_x is None or previous_y is None:
-                    previous_x, previous_y = wrist_x, wrist_y  
+            for hand in results.multi_hand_landmarks:
 
-            
-                if is_pinch(hand_landmarks, frame_width, frame_height):
-                    index_tip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP]
-                    x = int(index_tip.x * frame_width)
-                    y = int(index_tip.y * frame_height)
+                mp_draw.draw_landmarks(
+                    frame,
+                    hand,
+                    mp_hands.HAND_CONNECTIONS
+                )
 
-                    
-                    virtual_screen_x = np.interp(x, [0, frame_width], [0, screen_width * scale_factor_x])
-                    virtual_screen_y = np.interp(y, [0, frame_height], [0, screen_height * scale_factor_y])
+                wrist = hand.landmark[0]
 
-                   
-                    final_x = previous_x * smooth_factor + virtual_screen_x * (1 - smooth_factor)
-                    final_y = previous_y * smooth_factor + virtual_screen_y * (1 - smooth_factor)
+                wx = wrist.x * w
+                wy = wrist.y * h
+
+                if previous_x is None:
+                    previous_x, previous_y = wx, wy
+
+                if pinch(hand, w, h):
+
+                    index = hand.landmark[8]
+
+                    x = int(index.x * w)
+                    y = int(index.y * h)
+
+                    sx = np.interp(x, [0, w], [0, screen_width * scale_x])
+                    sy = np.interp(y, [0, h], [0, screen_height * scale_y])
+
+                    final_x = previous_x * smooth_factor + sx * (1 - smooth_factor)
+                    final_y = previous_y * smooth_factor + sy * (1 - smooth_factor)
 
                     pyautogui.moveTo(final_x, final_y)
+
                     previous_x, previous_y = final_x, final_y
-                    cv2.circle(frame, (x, y), 5, (0, 255, 0), -1)
-                    
-                elif is_middle_thumb_together(hand_landmarks, frame_width, frame_height):
-                    current_time = time.time()
-                    if current_time - last_click_time > 0.5:
-                        if wrist_x < frame_width / 2:
-                            pyautogui.click(button='right')
-                        else:
-                            pyautogui.click(button='left')
-                        last_click_time = current_time
+
+                elif click_gesture(hand, w, h):
+
+                    now = time.time()
+
+                    if now - last_click > 0.5:
+
+                        button = "right" if wx < w / 2 else "left"
+                        pyautogui.click(button=button)
+
+                        last_click = now
 
         cv2.imshow("Hand Tracking", frame)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(1) & 0xFF == ord("q"):
             break
 
     cap.release()
     cv2.destroyAllWindows()
 
 
-if __name__ == '__main__':
-    main_loop()
-
-
+if __name__ == "__main__":
+    main()
