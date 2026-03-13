@@ -55,21 +55,19 @@ namespace ConsoleApp13
                 int dx =  x - enemyX;
                 int dy = y - enemyY;
                 
-                if (Math.Abs(dx) + Math.Abs(dy) <= 15 )
+                if (Math.Abs(dx) + Math.Abs(dy) <= 5 )
                 {
                     int choose = rnd.Next(0, 2);
                     switch (choose)
                     {
                         case 0:
                             if (dx > 0) enemymovex += 1;
-                            else if (dx < 0) enemymovex -= 1;
-                            if (dy > 0) enemymovey += 1;
-                            else if (dy < 0) enemymovey -= 1; break;
+                            else if (dx < 0) enemymovex -= 1; break;
+                            
                         case 1:
                             if (dy > 0) enemymovey += 1;
-                            else if (dy < 0) enemymovey -= 1; 
-                            if (dx > 0) enemymovex += 1;
-                            else if (dx < 0) enemymovex -= 1; break;
+                            else if (dy < 0) enemymovey -= 1;  break;
+                            
                     }
                     enemymovex = Math.Clamp(enemymovex, 0, width - 1);
                     enemymovey = Math.Clamp(enemymovey, 0, height - 1);
