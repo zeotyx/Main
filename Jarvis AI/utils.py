@@ -2,29 +2,40 @@ import pyttsx3
 from decouple import config
 from datetime import datetime
 
-USERNAME = config('USER')
-BOTNAME = config('BOTNAME')
 
-engine = pyttsx3.init('sapi5')
+USERNAME = config("USER")
+BOTNAME = config("BOTNAME")
 
-# Set Rate
-engine.setProperty('rate', 190)
 
-# Set Volume
-engine.setProperty('volume', 1.0)
+def init_tts():
+    engine = pyttsx3.init("sapi5")
 
-# Set Voice (Female)
-voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[1].id)
+    engine.setProperty("rate", 185)
+    engine.setProperty("volume", 1.0)
+
+    voices = engine.getProperty("voices")
+    engine.setProperty("voice", voices[1].id)
+
+    return engine
+
+
+engine = init_tts()
+
 
 def speak(text):
-    """Used to speak whatever text is passed to it"""
     engine.say(text)
     engine.runAndWait()
 
+
 def greet_user():
-    """Greets the user according to the time"""
     hour = datetime.now().hour
-    if (hour >= 6) and (hour < 12):
-        speak(f"Good Morning {USERNAME}")
-    elif (hour >= 12) and (hour < 16
+
+    if hour < 12:
+        greeting = "Good morning"
+    elif hour < 18:
+        greeting = "Good afternoon"
+    else:
+        greeting = "Good evening"
+
+    speak(f"{greeting} {USERNAME}")
+    speak(f"I'm {BOTNAME}. How can I help?")
