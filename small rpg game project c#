@@ -27,47 +27,52 @@ namespace ConsoleApp13
             
             InitializeMap(x, y);
             DrawMap();
-            
+            Console.SetCursorPosition(enemyX, height - 1 - enemyY);
+            Console.Write(Enemy);
             ConsoleKeyInfo key;
-
+            Random rnd = new Random();
             while (true)
             {
-                Random rnd = new Random();
+                
                 Console.CursorVisible = false;
                 if (Console.KeyAvailable)
                 {
-                    
-                    key = Console.ReadKey(intercept: true);
 
-                    int newX = x;
-                    int newY = y;
-
-                    if (key.Key == ConsoleKey.W) newY += 1;
-                    if (key.Key == ConsoleKey.S) newY -= 1;
-                    if (key.Key == ConsoleKey.A) newX -= 1;
-                    if (key.Key == ConsoleKey.D) newX += 1;
-
-
-                    newX = Math.Clamp(newX, 0, width - 1);
-                    newY = Math.Clamp(newY, 0, height - 1);
-
-
-                    if (map[newX, newY] != wall)
+                    while (Console.KeyAvailable)
                     {
+                        key = Console.ReadKey(intercept: true);
 
-                        Console.SetCursorPosition(prevX, height - 1 - prevY);
-                        Console.Write(map[prevX, prevY]);
+                        int newX = x;
+                        int newY = y;
 
-                        x = newX;
-                        y = newY;
+                        if (key.Key == ConsoleKey.W) newY += 1;
+                        if (key.Key == ConsoleKey.S) newY -= 1;
+                        if (key.Key == ConsoleKey.A) newX -= 1;
+                        if (key.Key == ConsoleKey.D) newX += 1;
 
 
-                        Console.SetCursorPosition(x, height - 1 - y);
-                        Console.Write(Player);
+                        newX = Math.Clamp(newX, 0, width - 1);
+                        newY = Math.Clamp(newY, 0, height - 1);
 
-                        prevX = x;
-                        prevY = y;
+
+                        if (map[newX, newY] != wall)
+                        {
+
+                            Console.SetCursorPosition(prevX, height - 1 - prevY);
+                            Console.Write(map[prevX, prevY]);
+
+                            x = newX;
+                            y = newY;
+
+
+                            Console.SetCursorPosition(x, height - 1 - y);
+                            Console.Write(Player);
+
+                            prevX = x;
+                            prevY = y;
+                        }
                     }
+                        
 
                     
                 }
@@ -85,16 +90,16 @@ namespace ConsoleApp13
                 enemymovey = Math.Clamp(enemymovey, 0, height - 1);
                 if (map[enemymovex, enemymovey] != wall && (enemymovex != x || enemymovey != y))
                 {
-                    map[enemyX, enemyY] = Empty;
                     Console.SetCursorPosition(enemyX, height - 1 - enemyY);
-                    Console.Write(Empty);
+                    Console.Write(map[enemyX, enemyY]);
 
                     enemyX = enemymovex;
                     enemyY = enemymovey;
+
                     Console.SetCursorPosition(enemyX, height - 1 - enemyY);
                     Console.Write(Enemy);
                 }
-                System.Threading.Thread.Sleep(100);
+                Thread.Sleep(100);
             }
         }
 
@@ -116,8 +121,8 @@ namespace ConsoleApp13
             }
             for (int y = 0; y < height; y++)
             {
-                map[0, y] = wall;           
-                map[width - 1, y] = wall;   
+                map[0, y] = wall;            
+                map[width - 1, y] = wall;    
             }
 
             map[playerX, playerY] = Empty;
