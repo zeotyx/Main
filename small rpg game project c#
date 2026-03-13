@@ -96,20 +96,20 @@ namespace ConsoleApp13
                         int right = 1000;
 
                         // Up direction check
-                        if (enemyY + 1 < height && map[enemymovex, enemymovey + 1] != wall)
-                            up = Math.Abs(x - enemyX) + Math.Abs(y - (enemyY + 1));
+                        if (enemymovey + 1 < height && map[enemymovex, enemymovey + 1] != wall)
+                            up = Math.Abs(x - enemymovex) + Math.Abs(y - (enemymovey + 1));
 
                         // Down direction check
-                        if (enemyY - 1 >= 0 && map[enemymovex, enemymovey - 1] != wall)
-                            down = Math.Abs(x - enemyX) + Math.Abs(y - (enemyY - 1));
+                        if (enemymovey - 1 >= 0 && map[enemymovex, enemymovey - 1] != wall)
+                            down = Math.Abs(x - enemymovex) + Math.Abs(y - (enemymovey - 1));
 
                         // Left direction check
-                        if (enemyX - 1 >= 0 && map[enemymovex - 1, enemymovey] != wall)
-                            left = Math.Abs(x - (enemyX - 1)) + Math.Abs(y - enemyY);
+                        if (enemymovex - 1 >= 0 && map[enemymovex - 1, enemymovey] != wall)
+                            left = Math.Abs(x - (enemymovex - 1)) + Math.Abs(y - enemymovey);
 
                         // Right direction check
-                        if (enemyX + 1 < width && map[enemymovex + 1, enemymovey] != wall)
-                            right = Math.Abs(x - (enemyX + 1)) + Math.Abs(y - enemyY);
+                        if (enemymovex + 1 < width && map[enemymovex + 1, enemymovey] != wall)
+                            right = Math.Abs(x - (enemymovex + 1)) + Math.Abs(y - enemymovey);
 
 
                         int smallest = Math.Min(Math.Min(up, down), Math.Min(left, right));
