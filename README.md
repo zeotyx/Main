@@ -1,5 +1,5 @@
 <!-- introductory empty line for better spacing --> <div align="center"> <img src="https://github.com/tvoje-jmeno/tvoje-jmeno/raw/main/assets/welcome.gif" width="800" alt="Welcome to my profile!" /> <br><br> <h1>Hello! I’m Axel (Antonín Málek) 🚀</h1> <p> <strong>Full-stack Developer | Python & TypeScript Enthusiast | Open-source Lover</strong><br> Currently building the Jarvis assistant (inspired by the Ironman movie). I want to reach AGI (I don’t have the knowledge or resources for that yet :D) </p> <!-- badges / stats – optional, but looks nice --> <p> <img src="https://komarev.com/ghpvc/?username=zeotyx&label=Profile%20Views&color=0e75b6&style=flat-square" alt="Profile views" /> <a href="https://github.com/zeotyx?tab=repositories&sort=stargazers"> <img src="https://img.shields.io/github/stars/zeotyx?style=flat-square&color=yellow&label=Total%20Stars" alt="Total GitHub stars" /> </a> </p> </div> <br>
-🛠️ What I’m Currently Working On / Most Interested In
+🛠️ What I’m Currently Working On / Most Interested In iam mostly interested in learning physics, advanced math, philosophy and just becoming something like polymath, i also love programming and i finally managed to get back into it>:D
 
 🔭 Currently working on a fundamental theory of everything, Jarvis AI, C# calculator (will cover all physics, math, chemistry, and biology fields), IPX hacking tool
 
