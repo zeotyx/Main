@@ -6,18 +6,23 @@ namespace ConsoleApp13
 {
     internal class Program
     {
-        const char Empty = ',';
+        
+        const char Empty = '.';
         const char Player = 'P';
         const char wall = '#';
         const char Enemy = 'E';
         static int width = 40;
         static int height = 20;
-        
+        static int playerHP = 10;
 
         static char[,] map = new char[width, height];
 
         static void Main(string[] args)
         {
+            Stopwatch attackTimer = new Stopwatch();
+            attackTimer.Start();
+
+
             Console.SetWindowSize(80, 50);
             Console.SetBufferSize(80, 50);
             int x = width / 2;
@@ -29,6 +34,8 @@ namespace ConsoleApp13
             
             InitializeMap(x, y);
             DrawMap();
+            Console.SetCursorPosition(0, height + 2);
+            Console.WriteLine($"Hp:{playerHP}");
             Console.SetCursorPosition(enemyX, height - 1 - enemyY);
             Console.Write(Enemy);
             ConsoleKeyInfo key = new ConsoleKeyInfo();
@@ -57,7 +64,7 @@ namespace ConsoleApp13
                 int dx =  x - enemyX;
                 int dy = y - enemyY;
                 
-                if (Math.Abs(dx) + Math.Abs(dy) <= 5 )
+                if (Math.Abs(dx) + Math.Abs(dy) <= 8 )
                 {
                     int choose = rnd.Next(0, 2);
                     switch (choose)
@@ -161,6 +168,24 @@ namespace ConsoleApp13
                         
                     }
                 }
+                if (Math.Abs(dx) + Math.Abs(dy) <= 1)
+                {
+                    if (attackTimer.ElapsedMilliseconds > 1000)
+                    {
+                        playerHP--;
+                        Console.SetCursorPosition(0, height + 2);
+                        Console.Write($"Hp:{playerHP}   ");
+                        attackTimer.Restart();
+                    }
+
+                    if (playerHP <= 0)
+                    {
+                        Console.SetCursorPosition(0, height + 3);
+                        Console.WriteLine("Game over");
+                        Thread.Sleep(500);
+                        break;
+                    }
+                }
                 Thread.Sleep(100);
             }
         }
@@ -169,7 +194,7 @@ namespace ConsoleApp13
             Console.SetCursorPosition(x, height - 1 - y);
             Console.Write(symbol);
         }
-        static void Player_Movement(ConsoleKeyInfo key, ref int x, ref int y, ref int prevY, ref int prevX)
+        static void Player_Movement(ConsoleKeyInfo key, ref int x, ref int y,  ref int prevX,ref int prevY)
         {
             
             int newX = x;
@@ -222,8 +247,9 @@ namespace ConsoleApp13
                 map[0, y] = wall;            
                 map[width - 1, y] = wall;    
             }
-
+            
             map[playerX, playerY] = Empty;
+            
         }
 
         static void DrawMap()
@@ -234,6 +260,7 @@ namespace ConsoleApp13
                 {
                     Console.Write(map[x, y]);
                 }
+                
                 Console.WriteLine();
             }
         }
