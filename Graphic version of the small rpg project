@@ -1,0 +1,136 @@
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using SharpDX.Direct2D1;
+using SharpDX.Direct3D9;
+using System;
+
+namespace rpg_game
+{
+    
+    public class Game1 : Game
+    {
+        private Texture2D wallTexture;
+        private Texture2D groundTexture;
+        private Texture2D playerTexture;
+        private Texture2D enemyTexture;
+        
+        private const char wall = '#';
+        private const char empty = ',';
+
+        static int width = 40;
+        static int height = 20;
+        static char[,] map = new char[width, height];
+        private int tileSize = 32;
+
+        static int playerX = width / 2;
+        static int playerY = height / 2;
+
+        static int enemyX = width / 4;
+        static int enemyY = height / 4;
+        private GraphicsDeviceManager _graphics;
+        private Microsoft.Xna.Framework.Graphics.SpriteBatch _spriteBatch;
+
+        public Game1()
+        {
+            _graphics = new GraphicsDeviceManager(this);
+            Content.RootDirectory = "Content";
+            IsMouseVisible = true;
+        }
+
+        protected override void Initialize()
+        {
+            // TODO: Add your initialization logic here
+            Random rnd = new Random();
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    map[x, y] = rnd.NextDouble() < 0.05 ? wall : empty;
+                }
+            }
+
+            // Set borders as walls
+            for (int x = 0; x < width; x++)
+            {
+                map[x, 0] = wall;
+                map[x, height - 1] = wall;
+            }
+            for (int y = 0; y < height; y++)
+            {
+                map[0, y] = wall;
+                map[width - 1, y] = wall;
+            }
+
+            // Make sure player start is empty
+            map[playerX, playerY] = empty;
+            base.Initialize();
+        }
+
+        protected override void LoadContent()
+        {
+            _spriteBatch = new Microsoft.Xna.Framework.Graphics.SpriteBatch(GraphicsDevice);
+            // wall texture
+            wallTexture = new Texture2D(GraphicsDevice, 1, 1);
+            wallTexture.SetData(new[] { Color.Gray });
+
+            // ground texture
+            groundTexture = new Texture2D(GraphicsDevice, 1, 1);
+            groundTexture.SetData(new[] { Color.Green });
+
+            // player texture
+            playerTexture = new Texture2D(GraphicsDevice, 1, 1);
+            playerTexture.SetData(new[] { Color.Blue });
+
+            // enemy texture
+            enemyTexture = new Texture2D(GraphicsDevice, 1, 1);
+            enemyTexture.SetData(new[] { Color.Red });
+            // TODO: use this.Content to load your game content here
+        }
+
+        protected override void Update(GameTime gameTime)
+        {
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+                Exit();
+
+            // TODO: Add your update logic here
+            KeyboardState kb = Keyboard.GetState();
+
+            if (kb.IsKeyDown(Keys.W)) playerY -= 1;
+            if (kb.IsKeyDown(Keys.S)) playerY += 1;
+            if (kb.IsKeyDown(Keys.A)) playerX -= 1;
+            if (kb.IsKeyDown(Keys.D)) playerX += 1;
+
+            // clamp positions and check walls
+            playerX = Math.Clamp(playerX, 0, width - 1);
+            playerY = Math.Clamp(playerY, 0, height - 1);
+
+
+            base.Update(gameTime);
+        }
+
+        protected override void Draw(GameTime gameTime)
+        {
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            _spriteBatch.Begin();
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    Texture2D tex = map[x, y] == wall ? wallTexture : groundTexture;
+                    _spriteBatch.Draw(tex, new Rectangle(x * tileSize, y * tileSize, tileSize, tileSize), Color.White);
+                }
+            }
+
+            _spriteBatch.Draw(playerTexture, new Rectangle(playerX * tileSize, playerY * tileSize, tileSize, tileSize), Color.White);
+            _spriteBatch.Draw(enemyTexture, new Rectangle(enemyX * tileSize, enemyY * tileSize, tileSize, tileSize), Color.White);
+
+            _spriteBatch.End();
+
+            base.Draw(gameTime);
+        }
+    }
+}
