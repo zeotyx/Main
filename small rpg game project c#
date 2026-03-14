@@ -13,10 +13,13 @@ namespace ConsoleApp13
         const char Enemy = 'E';
         static int width = 40;
         static int height = 20;
+
         static int playerHP = 10;
+        static int enemyHP = 3;
 
         static char[,] map = new char[width, height];
-
+        
+        
         static void Main(string[] args)
         {
             Stopwatch attackTimer = new Stopwatch();
@@ -34,17 +37,25 @@ namespace ConsoleApp13
             
             InitializeMap(x, y);
             DrawMap();
+            DrawEntity(x, y, Player);
+            
             Console.SetCursorPosition(0, height + 2);
-            Console.WriteLine($"Hp:{playerHP}");
+            Console.Write($"Hp:{playerHP}");
+            Console.SetCursorPosition(20, height + 2);
+            Console.Write($"Enemy HP: {enemyHP}   ");
             Console.SetCursorPosition(enemyX, height - 1 - enemyY);
             Console.Write(Enemy);
             ConsoleKeyInfo key = new ConsoleKeyInfo();
             Random rnd = new Random();
             Console.CursorVisible = false;
+            
             while (true)
             {
-                
 
+                int enemymovex = enemyX;
+                int enemymovey = enemyY;
+                int dx = x - enemyX;
+                int dy = y - enemyY;
                 if (Console.KeyAvailable)
                 {
                     key = Console.ReadKey(intercept: true);
@@ -54,16 +65,30 @@ namespace ConsoleApp13
                         key = Console.ReadKey(intercept: true);                        
                     }
                     Player_Movement(key, ref x, ref y, ref prevX, ref prevY);
+                    if (key.Key == ConsoleKey.Spacebar)
+                    {
+                        if (Math.Abs(dx) + Math.Abs(dy) <= 1 && attackTimer.ElapsedMilliseconds > 400)
+                        {
+                            enemyHP--;
+                            Console.SetCursorPosition(20, height + 2);
+                            Console.Write($"Enemy HP: {enemyHP}   ");
+                            attackTimer.Restart();
+                        }
 
+                    }
 
                 }
 
                 //enemy movement
-                int enemymovex = enemyX;
-                int enemymovey = enemyY;
-                int dx =  x - enemyX;
-                int dy = y - enemyY;
-                
+
+                if (enemyHP <= 0)
+                {
+                    Console.SetCursorPosition(enemyX, height - 1 - enemyY);
+                    Console.Write(map[enemyX, enemyY]);
+
+                    enemyX = -100;
+                    enemyY = -100;
+                }
                 if (Math.Abs(dx) + Math.Abs(dy) <= 8 )
                 {
                     int choose = rnd.Next(0, 2);
@@ -191,6 +216,7 @@ namespace ConsoleApp13
         }
         static void DrawEntity(int x, int y, char symbol)
         {
+
             Console.SetCursorPosition(x, height - 1 - y);
             Console.Write(symbol);
         }
@@ -204,7 +230,7 @@ namespace ConsoleApp13
             if (key.Key == ConsoleKey.S) newY -= 1;
             if (key.Key == ConsoleKey.A) newX -= 1;
             if (key.Key == ConsoleKey.D) newX += 1;
-
+            
 
             newX = Math.Clamp(newX, 0, width - 1);
             newY = Math.Clamp(newY, 0, height - 1);
