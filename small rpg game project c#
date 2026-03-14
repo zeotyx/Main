@@ -1,27 +1,23 @@
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
+using System.Collections.Generic;
 
 namespace ConsoleApp13
 {
     internal class Program
     {
-        
         const char Empty = '.';
         const char Player = 'P';
         const char wall = '#';
-        const char Enemy = 'E';
+        const char EnemyChar = 'E';
+
         static int width = 40;
         static int height = 20;
 
         static int playerHP = 10;
-        static int enemyHP = 3;
-        static int enemyX = width / 4;
-        static int enemyY = height / 4;
-        static char[,] map = new char[width, height];
 
-        
+        static char[,] map = new char[width, height];
+        static Random rnd = new Random();
 
         static void Main(string[] args)
         {
@@ -34,233 +30,151 @@ namespace ConsoleApp13
             Stopwatch attackTimer = new Stopwatch();
             attackTimer.Start();
 
-
             Console.SetWindowSize(80, 50);
             Console.SetBufferSize(80, 50);
+            Console.CursorVisible = false;
+
             int x = width / 2;
             int y = height / 2;
             int prevX = x;
             int prevY = y;
-            
-            
+
             InitializeMap(x, y);
             DrawMap();
+
             DrawEntity(x, y, Player);
-            
-            Console.SetCursorPosition(0, height + 2);
-            Console.Write($"Hp:{playerHP}");
-            Console.SetCursorPosition(20, height + 2);
-            Console.Write($"Enemy HP: {enemyHP}   ");
-            Console.SetCursorPosition(enemyX, height - 1 - enemyY);
-            Console.Write(Enemy);
-            ConsoleKeyInfo key = new ConsoleKeyInfo();
-            Random rnd = new Random();
-            Console.CursorVisible = false;
-            
+
+            foreach (var enemy in enemies)
+                DrawEntity(enemy.x, enemy.y, EnemyChar);
+
+            ConsoleKeyInfo key;
+
             while (true)
             {
-
-                int dx = x - enemyX;
-                int dy = y - enemyY;
                 if (Console.KeyAvailable)
                 {
-                    key = Console.ReadKey(intercept: true);
-                    while (Console.KeyAvailable)
-                    {
+                    key = Console.ReadKey(true);
 
-                        key = Console.ReadKey(intercept: true);                        
-                    }
                     Player_Movement(key, ref x, ref y, ref prevX, ref prevY);
-                    if (key.Key == ConsoleKey.Spacebar)
+
+                    if (key.Key == ConsoleKey.Spacebar &&
+                        attackTimer.ElapsedMilliseconds > 400)
                     {
-                        if (Math.Abs(dx) + Math.Abs(dy) <= 1 && attackTimer.ElapsedMilliseconds > 400)
+                        foreach (var enemy in enemies)
                         {
-                            enemyHP--;
-                            Console.SetCursorPosition(20, height + 2);
-                            Console.Write($"Enemy HP: {enemyHP}   ");
-                            attackTimer.Restart();
+                            int dx = x - enemy.x;
+                            int dy = y - enemy.y;
+
+                            if (Math.Abs(dx) + Math.Abs(dy) <= 1)
+                            {
+                                enemy.HP--;
+                            }
                         }
 
-                    }
-
-                }
-
-                //enemy movement
-                EnemyMovment(dx, dy, x, y);
-                if (Math.Abs(dx) + Math.Abs(dy) <= 1)
-                {
-                    if (attackTimer.ElapsedMilliseconds > 1000)
-                    {
-                        playerHP--;
-                        Console.SetCursorPosition(0, height + 2);
-                        Console.Write($"Hp:{playerHP}   ");
                         attackTimer.Restart();
                     }
+                }
 
-                    if (playerHP <= 0)
+                enemies.RemoveAll(e => e.HP <= 0);
+
+                foreach (var enemy in enemies)
+                    EnemyMovement(enemy, x, y);
+
+                foreach (var enemy in enemies)
+                {
+                    int dx = x - enemy.x;
+                    int dy = y - enemy.y;
+
+                    if (Math.Abs(dx) + Math.Abs(dy) <= 1 &&
+                        attackTimer.ElapsedMilliseconds > 1000)
                     {
-                        Console.SetCursorPosition(0, height + 3);
-                        Console.WriteLine("Game over");
-                        Thread.Sleep(500);
-                        break;
+                        playerHP--;
+                        attackTimer.Restart();
+
+                        Console.SetCursorPosition(0, height + 2);
+                        Console.Write($"HP: {playerHP}   ");
+
+                        if (playerHP <= 0)
+                        {
+                            Console.SetCursorPosition(0, height + 3);
+                            Console.WriteLine("Game Over");
+                            return;
+                        }
                     }
                 }
 
+                Thread.Sleep(100);
             }
         }
+
         static void DrawEntity(int x, int y, char symbol)
         {
-
             Console.SetCursorPosition(x, height - 1 - y);
             Console.Write(symbol);
         }
-        static void EnemyMovment(int dx, int dy, int x, int y)
+
+        static void EnemyMovement(Enemy enemy, int playerX, int playerY)
         {
-            int enemymovex = enemyX;
-            int enemymovey = enemyY;
-            Random rnd = new Random();
+            int dx = playerX - enemy.x;
+            int dy = playerY - enemy.y;
 
-            if (enemyHP <= 0)
-            {
-                Console.SetCursorPosition(enemyX, height - 1 - enemyY);
-                Console.Write(map[enemyX, enemyY]);
+            int newX = enemy.x;
+            int newY = enemy.y;
 
-                enemyX = -100;
-                enemyY = -100;
-            }
             if (Math.Abs(dx) + Math.Abs(dy) <= 8)
             {
-                int choose = rnd.Next(0, 2);
-                switch (choose)
-                {
-                    case 0:
-                        if (dx > 0) enemymovex += 1;
-                        else if (dx < 0) enemymovex -= 1; break;
-
-                    case 1:
-                        if (dy > 0) enemymovey += 1;
-                        else if (dy < 0) enemymovey -= 1; break;
-
-                }
-                enemymovex = Math.Clamp(enemymovex, 0, width - 1);
-                enemymovey = Math.Clamp(enemymovey, 0, height - 1);
-                if (map[enemymovex, enemymovey] != wall && (enemymovex != x || enemymovey != y))
-                {
-                    Console.SetCursorPosition(enemyX, height - 1 - enemyY);
-                    Console.Write(map[enemyX, enemyY]);
-
-                    enemyX = enemymovex;
-                    enemyY = enemymovey;
-
-                    DrawEntity(enemyX, enemyY, Enemy);
-                }
-                else if (map[enemymovex, enemymovey] == wall)
-                {
-
-                    int prevdp = Math.Abs(dx) + Math.Abs(dy);
-
-
-                    int up = 1000;
-                    int down = 1000;
-                    int left = 1000;
-                    int right = 1000;
-
-                    // Up direction check
-                    if (enemymovey + 1 < height && map[enemymovex, enemymovey + 1] != wall)
-                        up = Math.Abs(x - enemymovex) + Math.Abs(y - (enemymovey + 1));
-
-                    // Down direction check
-                    if (enemymovey - 1 >= 0 && map[enemymovex, enemymovey - 1] != wall)
-                        down = Math.Abs(x - enemymovex) + Math.Abs(y - (enemymovey - 1));
-
-                    // Left direction check
-                    if (enemymovex - 1 >= 0 && map[enemymovex - 1, enemymovey] != wall)
-                        left = Math.Abs(x - (enemymovex - 1)) + Math.Abs(y - enemymovey);
-
-                    // Right direction check
-                    if (enemymovex + 1 < width && map[enemymovex + 1, enemymovey] != wall)
-                        right = Math.Abs(x - (enemymovex + 1)) + Math.Abs(y - enemymovey);
-
-
-                    int smallest = Math.Min(Math.Min(up, down), Math.Min(left, right));
-                    if (smallest == up)
-                    {
-                        enemymovey += 1;
-                    }
-                    else if (smallest == down)
-                    {
-                        enemymovey -= 1;
-                    }
-                    else if (smallest == left)
-                    {
-                        enemymovex -= 1;
-                    }
-                    else if (smallest == right)
-                    {
-                        enemymovex += 1;
-                    }
-                    Console.SetCursorPosition(enemyX, height - 1 - enemyY);
-                    Console.Write(map[enemyX, enemyY]);
-
-                    enemyX = enemymovex;
-                    enemyY = enemymovey;
-
-                    DrawEntity(enemyX, enemyY, Enemy);
-
-                }
+                if (rnd.Next(2) == 0)
+                    newX += Math.Sign(dx);
+                else
+                    newY += Math.Sign(dy);
             }
             else
             {
+                int dir = rnd.Next(4);
 
-                int movedirection = rnd.Next(4);
-                switch (movedirection)
-                {
-                    case 0: enemymovex += 1; break;
-                    case 1: enemymovex -= 1; break;
-                    case 2: enemymovey += 1; break;
-                    case 3: enemymovey -= 1; break;
-                }
-                enemymovex = Math.Clamp(enemymovex, 0, width - 1);
-                enemymovey = Math.Clamp(enemymovey, 0, height - 1);
-                if (map[enemymovex, enemymovey] != wall && (enemymovex != x || enemymovey != y))
-                {
-                    Console.SetCursorPosition(enemyX, height - 1 - enemyY);
-                    Console.Write(map[enemyX, enemyY]);
-
-                    enemyX = enemymovex;
-                    enemyY = enemymovey;
-                    DrawEntity(enemyX, enemyY, Enemy);
-
-                }
+                if (dir == 0) newX++;
+                if (dir == 1) newX--;
+                if (dir == 2) newY++;
+                if (dir == 3) newY--;
             }
-            
-            Thread.Sleep(100);
-        }
-        static void Player_Movement(ConsoleKeyInfo key, ref int x, ref int y,  ref int prevX,ref int prevY)
-        {
-            
-            int newX = x;
-            int newY = y;
-
-            if (key.Key == ConsoleKey.W) newY += 1;
-            if (key.Key == ConsoleKey.S) newY -= 1;
-            if (key.Key == ConsoleKey.A) newX -= 1;
-            if (key.Key == ConsoleKey.D) newX += 1;
-            
 
             newX = Math.Clamp(newX, 0, width - 1);
             newY = Math.Clamp(newY, 0, height - 1);
 
             if (map[newX, newY] != wall)
             {
-                int safePrevX = Math.Clamp(prevX, 0, width - 1);
-                int safePrevY = Math.Clamp(prevY, 0, height - 1);
-                Console.SetCursorPosition(safePrevX, height - 1 - safePrevY);
-                Console.Write(map[safePrevX, safePrevY]);
+                Console.SetCursorPosition(enemy.x, height - 1 - enemy.y);
+                Console.Write(map[enemy.x, enemy.y]);
+
+                enemy.x = newX;
+                enemy.y = newY;
+
+                DrawEntity(enemy.x, enemy.y, EnemyChar);
+            }
+        }
+
+        static void Player_Movement(ConsoleKeyInfo key,
+            ref int x, ref int y,
+            ref int prevX, ref int prevY)
+        {
+            int newX = x;
+            int newY = y;
+
+            if (key.Key == ConsoleKey.W) newY++;
+            if (key.Key == ConsoleKey.S) newY--;
+            if (key.Key == ConsoleKey.A) newX--;
+            if (key.Key == ConsoleKey.D) newX++;
+
+            newX = Math.Clamp(newX, 0, width - 1);
+            newY = Math.Clamp(newY, 0, height - 1);
+
+            if (map[newX, newY] != wall)
+            {
+                Console.SetCursorPosition(prevX, height - 1 - prevY);
+                Console.Write(map[prevX, prevY]);
 
                 x = newX;
                 y = newY;
-
 
                 DrawEntity(x, y, Player);
 
@@ -268,10 +182,9 @@ namespace ConsoleApp13
                 prevY = y;
             }
         }
+
         static void InitializeMap(int playerX, int playerY)
         {
-            Random rnd = new Random();
-
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
@@ -279,19 +192,20 @@ namespace ConsoleApp13
                     map[x, y] = rnd.NextDouble() < 0.1 ? wall : Empty;
                 }
             }
+
             for (int x = 0; x < width; x++)
             {
-                map[x, 0] = wall;            
-                map[x, height - 1] = wall;   
+                map[x, 0] = wall;
+                map[x, height - 1] = wall;
             }
+
             for (int y = 0; y < height; y++)
             {
-                map[0, y] = wall;            
-                map[width - 1, y] = wall;    
+                map[0, y] = wall;
+                map[width - 1, y] = wall;
             }
-            
+
             map[playerX, playerY] = Empty;
-            
         }
 
         static void DrawMap()
@@ -302,16 +216,16 @@ namespace ConsoleApp13
                 {
                     Console.Write(map[x, y]);
                 }
-                
+
                 Console.WriteLine();
             }
         }
     }
-    class Enemy()
+
+    class Enemy
     {
         public int x;
         public int y;
         public int HP;
     }
-
 }
