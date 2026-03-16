@@ -1,0 +1,86 @@
+namespace skolni_databaze
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            string[] studenti = { "petr", "pavel", "dominik"};
+            string[] predmety = { "matika", "cestina"};
+            double[,] znamky = new double[predmety.Length, studenti.Length];
+
+            znamky[0, 0] = 2.5;
+            znamky[0, 1] = 1.5;
+            znamky[0, 2] = 1;
+
+            znamky[1, 0] = 1;
+            znamky[1, 1] = 3;
+            znamky[1, 2] = 2;
+
+            bool[] dochaz_obed = { };
+            double[,] absence =
+            {
+                 { 3.0, 6.5, 6.0 },
+                 { 1.0, 4.0, 7.5 }
+            };
+
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("co ma databaze zobrazit?\n1)predmety\n2)studenty");
+                int volba = Convert.ToInt32(Console.ReadLine());
+                if (volba == 1)
+                {
+                    Console.Clear();
+                    
+                    Console.WriteLine("co chcete zobrazit dale\n1)kolik studentu ma vyssi absenci nez 5% v danem predmetu\n2)jake jsou prumery znamek v jednotlivych predmetech\n3)problemovi studenti(absence nad 10% nebo znamka 2.5 a vyssi)");
+                    volba = Convert.ToInt32(Console.ReadLine());
+                    if(volba == 1)
+                    {
+                        Console.WriteLine("jaky predmet\n1)matika\n2)cestina");
+                        volba = Convert.ToInt32(Console.ReadLine());
+                        if( volba == 1)
+                        {
+                            int pocet = 0;
+                            for (int student = 0; student < studenti.Length; student++)
+                            {
+                                if (absence[0, student] > 5)
+                                {
+                                    pocet++;
+                                }
+                            }
+                            Console.WriteLine("Počet studentů s absencí > 5 %: " + pocet);
+                        }
+                        if (volba == 2)
+                        {
+                            int pocet = 0;
+                            for (int student = 0; student < studenti.Length; student++)
+                            {
+                                if (absence[1, student] > 5)
+                                {
+                                    pocet++;
+                                }
+                            }
+                            Console.WriteLine("Počet studentů s absencí > 5 %: " + pocet);
+                        }
+                    }
+                    Console.WriteLine("\npress any key to continue"); Console.ReadKey();
+                }
+                else if(volba == 2)
+                {
+                    Console.Clear();
+                    foreach(string s in predmety)
+                    {
+                        Console.WriteLine(s);
+                    }
+                    Console.WriteLine("\npress any key to continue"); Console.ReadKey();
+                }
+                else
+                {
+                    Console.WriteLine("Spatny vyber");
+                    Thread.Sleep(300);
+                }
+            }
+            
+        }
+    }
+}
