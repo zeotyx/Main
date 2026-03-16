@@ -1,12 +1,13 @@
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace ConsoleApp13
 {
     internal class Program
     {
-        const char Empty = '.';
+        const char Empty = '░';
         const char Player = 'P';
         const char wall = '#';
         const char EnemyChar = 'E';
@@ -21,11 +22,12 @@ namespace ConsoleApp13
 
         static void Main(string[] args)
         {
-            List<Enemy> enemies = new List<Enemy>();
-
-            enemies.Add(new Enemy { x = 5, y = 5, HP = 3 });
-            enemies.Add(new Enemy { x = 10, y = 12, HP = 3 });
-            enemies.Add(new Enemy { x = 20, y = 7, HP = 3 });
+            List<Enemy> enemies = new List<Enemy>
+            {
+                new Enemy { x = 5, y = 5, HP = 3 },
+                new Enemy { x = 10, y = 12, HP = 3 },
+                new Enemy { x = 20, y = 7, HP = 3 }
+            };
 
             Stopwatch attackTimer = new Stopwatch();
             attackTimer.Start();
@@ -43,22 +45,22 @@ namespace ConsoleApp13
             DrawMap();
 
             DrawEntity(x, y, Player);
-
             foreach (var enemy in enemies)
                 DrawEntity(enemy.x, enemy.y, EnemyChar);
 
-            ConsoleKeyInfo key;
-
             while (true)
             {
+                
+                ConsoleKeyInfo keyInfo = new ConsoleKeyInfo();
                 if (Console.KeyAvailable)
                 {
-                    key = Console.ReadKey(true);
+                    keyInfo = Console.ReadKey(true);
+                    while (Console.KeyAvailable) 
+                        Console.ReadKey(true);
 
-                    Player_Movement(key, ref x, ref y, ref prevX, ref prevY);
+                    Player_Movement(keyInfo, ref x, ref y, ref prevX, ref prevY);
 
-                    if (key.Key == ConsoleKey.Spacebar &&
-                        attackTimer.ElapsedMilliseconds > 400)
+                    if (keyInfo.Key == ConsoleKey.Spacebar && attackTimer.ElapsedMilliseconds > 400)
                     {
                         foreach (var enemy in enemies)
                         {
@@ -66,27 +68,26 @@ namespace ConsoleApp13
                             int dy = y - enemy.y;
 
                             if (Math.Abs(dx) + Math.Abs(dy) <= 1)
-                            {
                                 enemy.HP--;
-                            }
                         }
-
                         attackTimer.Restart();
                     }
                 }
 
+                
                 enemies.RemoveAll(e => e.HP <= 0);
 
+                
                 foreach (var enemy in enemies)
                     EnemyMovement(enemy, x, y);
 
+                
                 foreach (var enemy in enemies)
                 {
                     int dx = x - enemy.x;
                     int dy = y - enemy.y;
 
-                    if (Math.Abs(dx) + Math.Abs(dy) <= 1 &&
-                        attackTimer.ElapsedMilliseconds > 1000)
+                    if (Math.Abs(dx) + Math.Abs(dy) <= 1 && attackTimer.ElapsedMilliseconds > 1000)
                     {
                         playerHP--;
                         attackTimer.Restart();
@@ -131,7 +132,6 @@ namespace ConsoleApp13
             else
             {
                 int dir = rnd.Next(4);
-
                 if (dir == 0) newX++;
                 if (dir == 1) newX--;
                 if (dir == 2) newY++;
@@ -153,9 +153,7 @@ namespace ConsoleApp13
             }
         }
 
-        static void Player_Movement(ConsoleKeyInfo key,
-            ref int x, ref int y,
-            ref int prevX, ref int prevY)
+        static void Player_Movement(ConsoleKeyInfo key, ref int x, ref int y, ref int prevX, ref int prevY)
         {
             int newX = x;
             int newY = y;
@@ -188,9 +186,7 @@ namespace ConsoleApp13
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
-                {
                     map[x, y] = rnd.NextDouble() < 0.1 ? wall : Empty;
-                }
             }
 
             for (int x = 0; x < width; x++)
@@ -213,10 +209,7 @@ namespace ConsoleApp13
             for (int y = height - 1; y >= 0; y--)
             {
                 for (int x = 0; x < width; x++)
-                {
                     Console.Write(map[x, y]);
-                }
-
                 Console.WriteLine();
             }
         }
