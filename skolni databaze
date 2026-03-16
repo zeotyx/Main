@@ -34,6 +34,7 @@ namespace skolni_databaze
                     
                     Console.WriteLine("co chcete zobrazit dale\n1)kolik studentu ma vyssi absenci nez 5% v danem predmetu\n2)jake jsou prumery znamek v jednotlivych predmetech\n3)problemovi studenti(absence nad 10% nebo znamka 2.5 a vyssi)");
                     volba = Convert.ToInt32(Console.ReadLine());
+
                     if(volba == 1)
                     {
                         Console.WriteLine("jaky predmet\n1)matika\n2)cestina");
@@ -63,7 +64,20 @@ namespace skolni_databaze
                             Console.WriteLine("Počet studentů s absencí > 5 %: " + pocet);
                         }
                     }
-                    Console.WriteLine("\npress any key to continue"); Console.ReadKey();
+                    else if (volba == 2)
+                    {
+                        double matika = 0;
+                        double cestina = 0;
+                        
+                        for (int znamka = 0; znamka < studenti.Length; znamka++)
+                        {
+                            matika += znamky[0, znamka];
+                            cestina += znamky[1, znamka];
+                            
+                        }
+                        Console.WriteLine($"prumer matika {Math.Round((matika/studenti.Length), 3)} prumer cestina {Math.Round((cestina / studenti.Length), 3)}");
+                    }
+                        Console.WriteLine("\npress any key to continue"); Console.ReadKey();
                 }
                 else if(volba == 2)
                 {
