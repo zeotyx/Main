@@ -19,10 +19,10 @@ namespace skolni_databaze
 
             double[,] absence =
             {
-                { 3.0, 6.5, 6.0 },
-                { 1.0, 4.0, 10 }
+                { 15.0, 6.5, 6.0 },
+                { 1.0, 4.0, 16.0 }
             };
-
+            bool[] obedy = { true, false, true };
             while (true)
             {
                 Console.Clear();
@@ -120,13 +120,65 @@ namespace skolni_databaze
                 }
                 else if (volba == 2)
                 {
-                    Console.Clear();
-
-                    foreach (string s in studenti)
+                    Console.WriteLine("1.\tVážený průměr ze všech předmětů pro jednotlivé studenty.\r\n2.\tZnámky studentů z konkrétního předmětu (uživatel zadá první písmeno příjmení).\r\n3.\tStudentů s absencí v některém z předmětů vyšší než 15 %.\r\n4.\tStudentů, kteří chodí na obědy.\r\n5.\tPrvních 5 studentů s nejlepším průměrem.\r\n6.\tStudenti s 5 nejvyššími absencemi v souhrnu ze všech předmětů.\r\n");
+                    if (!int.TryParse(Console.ReadLine(), out volba))
                     {
-                        Console.WriteLine(s);
+                        Console.WriteLine("spatny vstup");
+                        Thread.Sleep(1000);
+                        continue;
                     }
+                    if (volba == 1)
+                    {
+                        for (int student = 0; student < studenti.Length; student++)
+                        {
+                            double prumer = (znamky[0, student] + znamky[1, student]) / 2;
+                            Console.WriteLine($"{studenti[student]} ma prumer ze vsech predmetu {prumer}");
+                        }
+                    }
+                    if (volba == 2)
+                    {
+                        Console.WriteLine("napis prvni pismenko jmena"); string prvni_p = Console.ReadLine();
 
+                        for (int student = 0; student < studenti.Length; student++)
+                        {
+                            string s = studenti[student].First().ToString();
+                            if (s == prvni_p)
+                            {
+                                Console.WriteLine($"{studenti[student]} ma znamku z matiky {znamky[0, student]} a z cestiny {znamky[1, student]}");
+                            }
+                        }
+                    }
+                    if (volba == 3)
+                    {
+                        for (int student = 0; student < studenti.Length; student++)
+                        {
+                            if (absence[0, student] >= 15 || absence[1, student] >= 15)
+                            {
+                                Console.WriteLine($"student: {studenti[student]} ma absenci vyssi nez 15% ");
+                            }
+                        }
+                    }
+                    if (volba == 4)
+                    {
+                        for (int student = 0; student < studenti.Length; student++)
+                        {
+                            if (obedy[student] == true)
+                            {
+                                Console.WriteLine($"student {studenti[student]} chodi na obedy ");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"student {studenti[student]} nechodi na obedy ");
+                            }
+                        }
+                    }
+                    if (volba == 5)
+                    {
+
+                        for (int student = 0; student < studenti.Length; student++)
+                        {
+                        }
+                    }
                     Console.WriteLine("\npress any key to continue");
                     Console.ReadKey();
                 }
