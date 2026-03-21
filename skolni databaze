@@ -4,18 +4,24 @@ namespace skolni_databaze
     {
         static void Main(string[] args)
         {
-            string[] studenti = { "petr", "pavel", "dominik" };
+            string[] studenti = { "petr", "pavel", "dominik", "jana", "lena", "dan" };
             string[] predmety = { "matika", "cestina" };
 
             double[,] znamky = new double[predmety.Length, studenti.Length];
 
             znamky[0, 0] = 2.5;
             znamky[0, 1] = 1.5;
-            znamky[0, 2] = 1;
+            znamky[0, 2] = 1.1;
+            znamky[0, 3] = 1.5;
+            znamky[0, 4] = 1.6;
+            znamky[0, 5] = 1.9;
 
             znamky[1, 0] = 1;
             znamky[1, 1] = 3;
             znamky[1, 2] = 2;
+            znamky[1, 3] = 1.5;
+            znamky[1, 4] = 1.6;
+            znamky[1, 5] = 1.9;
 
             double[,] absence =
             {
@@ -174,10 +180,23 @@ namespace skolni_databaze
                     }
                     if (volba == 5)
                     {
-
+                        double[] prumery = new double[studenti.Length];
                         for (int student = 0; student < studenti.Length; student++)
                         {
+
+                            double prumer = (znamky[0, student] + znamky[1, student]) / 2;
+                            prumery[student] = prumer;
+                        }                       
+                        
+                        var top5 = prumery.Select((value, index) => new {Value = value, Index = index}).OrderByDescending(x => x.Value).Take(5);
+                        Console.WriteLine("top 5 studentu:\n");
+                        
+                        foreach (var prumer in top5)
+                        {
+                            Console.WriteLine($"{studenti[prumer.Index]} ma prumer {prumer.Value}");
                         }
+
+
                     }
                     Console.WriteLine("\npress any key to continue");
                     Console.ReadKey();
