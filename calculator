@@ -31,7 +31,6 @@ namespace calculator
             DisplayTextBlock.Text = calculation.ToString();
         }
 
-        // -------------------- OPERATOR BUTTONS --------------------
         private void OperatorButton_Click(object sender, RoutedEventArgs e)
         {
             string op = (sender as Button).Content.ToString();
@@ -49,7 +48,7 @@ namespace calculator
             DisplayTextBlock.Text = calculation.ToString();
         }
 
-        // -------------------- FUNCTION BUTTONS --------------------
+       
         private void FunctionButton_Click(object sender, RoutedEventArgs e)
         {
             string func = (sender as Button).Content.ToString();
@@ -62,7 +61,7 @@ namespace calculator
             DisplayTextBlock.Text = calculation.ToString();
         }
 
-        // -------------------- EQUALS BUTTON --------------------
+       
         private void ButtonEquals_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -96,14 +95,14 @@ namespace calculator
             }
         }
 
-        // -------------------- CLEAR BUTTON --------------------
+       
         private void ButtonClear_Click(object sender, RoutedEventArgs e)
         {
             calculation.Clear();
             DisplayTextBlock.Text = "0";
         }
 
-        // -------------------- BACKSPACE BUTTON --------------------
+        
         private void ButtonBackspace_Click(object sender, RoutedEventArgs e)
         {
             if (calculation.Length > 0)
@@ -113,7 +112,7 @@ namespace calculator
             }
         }
 
-        // -------------------- HELPERS --------------------
+       
         private string InsertImplicitMultiplication(string expr)
         {
             StringBuilder newExpr = new StringBuilder();
@@ -133,7 +132,7 @@ namespace calculator
 
         private double ToRadians(double degrees) => degrees * Math.PI / 180;
 
-        // -------------------- KEYBOARD INPUT --------------------
+      
         private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key >= Key.D0 && e.Key <= Key.D9) AppendNumber((e.Key - Key.D0).ToString());
