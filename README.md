@@ -1,16 +1,16 @@
-# Axel · zeotyx
+<h1 align="center">Project Directory</h1>
+<p align="center">Browse the projects that started in this repository.</p>
 
-I build C# apps, games, and utilities, and experiment with Python and TypeScript. I’m also interested in physics, math, philosophy, and cybersecurity.
+<h2>Project files</h2>
+<table>
+<tr><th>Open</th><th>Description</th></tr>
+<tr><td><a href="https://github.com/zeotyx/jarvis-ai"><strong>Jarvis AI</strong></a></td><td>Python voice assistant and desktop automation experiments.</td></tr>
+<tr><td><a href="https://github.com/zeotyx/game-experiments"><strong>Game Experiments</strong></a></td><td>Early C# games, simulations, and graphics experiments.</td></tr>
+<tr><td><a href="https://github.com/zeotyx/math-and-ml-experiments"><strong>Math &amp; Machine Learning Experiments</strong></a></td><td>Calculators, science utilities, and introductory neural networks.</td></tr>
+<tr><td><a href="https://github.com/zeotyx/desktop-utilities"><strong>Desktop Utilities</strong></a></td><td>Small Python and C++ utilities for local use.</td></tr>
+<tr><td><a href="https://github.com/zeotyx/ipx-tool"><strong>IPX Tool</strong></a></td><td>The original C# IPX Tool 0.6 source.</td></tr>
+<tr><td><a href="https://github.com/zeotyx/iss-dashboard"><strong>ISS Dashboard</strong></a></td><td>A Flask project with ISS speed views and dashboard templates.</td></tr>
+</table>
 
-## Projects in this repository
-
-| Project | What’s inside |
-| --- | --- |
-| [Jarvis AI](Jarvis%20AI/) | A personal assistant inspired by Iron Man. I’m interested in collaborating on it. |
-| [Small RPG](small%20rpg%20game%20project%20c%23/) and [graphical version](Graphic%20version%20of%20the%20small%20rpg%20project/) | Two versions of a small role-playing game. |
-| [Calculator](Simple%20Calculator%20%28not%20done%20yet%29%20C%23/) and [integral calculator](integral%20calculating%20c%23/) | C# experiments with calculators and math. |
-| [Password generator](Password%20Generator/) and [password manager](password_manager/) | Small utilities for working with passwords. |
-| [Neural network](simple%20Neural%20Network%20c%23/) | A C# learning project. |
-| [IPX Tool](IPX%20Tool%20in%20C%23%200.6v/) | A C# cybersecurity experiment. |
-
-I’m learning C#, Python, Lua, and C. You can find my other projects on [my GitHub profile](https://github.com/zeotyx).
+<h2>Original collection</h2>
+<p>The <a href="https://github.com/zeotyx/Main/tree/archive/original-projects">original layout and Git history</a> are available on the archive branch. The old compiled calculator build is there too.</p>
